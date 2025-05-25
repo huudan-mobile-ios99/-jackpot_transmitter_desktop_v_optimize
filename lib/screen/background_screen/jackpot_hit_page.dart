@@ -27,7 +27,7 @@ class JackpotHitShowScreen extends StatelessWidget {
         return null;
       },
       builder: (context, hitData) {
-        debugPrint('JackpotHitScreen BlocSelector: hitData=$hitData');
+        debugPrint('JackpotHitScreen BlocSelector: hitData=$hitData ');
         // Loading state
         if (hitData != null && hitData.containsKey('isLoading')) {
           if (hitData['error'] != null) {
@@ -40,7 +40,7 @@ class JackpotHitShowScreen extends StatelessWidget {
           return const Center(child: Text('', style: TextStyle(color: Colors.white)));
         }
         // Hit state
-        return JackpotBackgroundVideoHitWindowFadeAnimation(
+        return JackpotBackgroundVideoHitWindowFadeAnimationV2(
           id: hitData['id'].toString(),
           number: hitData['machineNumber'].toString(),
           value: hitData['amount'] == [] ? "0" : hitData['amount'].toString(),

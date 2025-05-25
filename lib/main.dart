@@ -3,8 +3,8 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:playtech_transmitter_app/screen/background_screen/jackpot_video_bghit_page.dart';
-import 'package:playtech_transmitter_app/screen/background_screen/jackpot_video_bgplaylist_page.txt';
+import 'package:playtech_transmitter_app/screen/background_screen/jackpot_video_bg_page2.dart';
+import 'package:playtech_transmitter_app/screen/background_screen/jackpot_video_bghit_page2.dart';
 import 'package:playtech_transmitter_app/service/config_custom.dart';
 import 'package:playtech_transmitter_app/screen/setting/bloc/setting_bloc.dart';
 import 'package:playtech_transmitter_app/screen/setting/bloc/setting_event.dart';
@@ -12,7 +12,6 @@ import 'package:playtech_transmitter_app/screen/setting/setting_service.dart';
 import 'package:playtech_transmitter_app/service/widget/circlar_progress.dart';
 import 'package:playtech_transmitter_app/screen/background_screen/bloc/video_bloc.dart';
 import 'package:playtech_transmitter_app/screen/background_screen/bloc_jp_price/jackpot_price_bloc.dart';
-import 'package:playtech_transmitter_app/screen/background_screen/jackpot_video_bg_page.dart';
 import 'package:playtech_transmitter_app/screen/background_screen/jackpot_hit_page.dart';
 import 'package:playtech_transmitter_app/screen/background_screen/bloc_socket_time/jackpot_bloc2.dart';
 import 'package:media_kit/media_kit.dart';                      // Provides [Player], [Media], [Playlist] etc.
@@ -33,7 +32,6 @@ Future<void> main() async {
         ..alignment = Alignment.center
         ..startDragging()
         ..minimize()
-        ..close()
         ..show();
     });
 }
@@ -102,7 +100,7 @@ class MyAppBodyState extends State<MyAppBody> {
           body:
            Stack(
             children: [
-               RepaintBoundary(child: JackpotBackgroundShowWindowFadeAnimate()), //show first (contain background and number jp prices)
+               RepaintBoundary(child: JackpotBackgroundShowWindowFadeAnimateV2()), //show first (contain background and number jp prices)
                RepaintBoundary(child: JackpotHitShowScreen()), //show second (contain video background of types of jp prices based on its id)
             ],
           )

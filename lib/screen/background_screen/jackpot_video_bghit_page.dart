@@ -6,12 +6,12 @@ import 'package:playtech_transmitter_app/service/config_custom.dart';
 import 'package:playtech_transmitter_app/screen/setting/setting_service.dart';
 import 'package:playtech_transmitter_app/service/widget/text_style.dart';
 
-class JackpotBackgroundVideoHitWindowFadeAnimation extends StatefulWidget {
+class JackpotBackgroundVideoHitWindowFadeAnimationV2 extends StatefulWidget {
   final String number;
   final String value;
   final String id;
 
-  const JackpotBackgroundVideoHitWindowFadeAnimation({
+  const JackpotBackgroundVideoHitWindowFadeAnimationV2({
     super.key,
     required this.number,
     required this.value,
@@ -19,68 +19,68 @@ class JackpotBackgroundVideoHitWindowFadeAnimation extends StatefulWidget {
   });
 
   @override
-  _JackpotBackgroundVideoHitWindowFadeAnimationState createState() => _JackpotBackgroundVideoHitWindowFadeAnimationState();
+  _JackpotBackgroundVideoHitWindowFadeAnimationV2State createState() => _JackpotBackgroundVideoHitWindowFadeAnimationV2State();
 }
 
-class _JackpotBackgroundVideoHitWindowFadeAnimationState extends State<JackpotBackgroundVideoHitWindowFadeAnimation>
+class _JackpotBackgroundVideoHitWindowFadeAnimationV2State extends State<JackpotBackgroundVideoHitWindowFadeAnimationV2>
     with SingleTickerProviderStateMixin {
   late final Player _player;
-
   late final VideoController _controller;
   final NumberFormat _numberFormat = NumberFormat('#,##0.00', 'en_US');
   String? _currentVideoPath;
+  bool _isSwitching = false;
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
-  final settingsService = SettingsService();
-
+  final SettingsService settingsService = SettingsService();
+  int _retryCount = 0;
+  static const int _maxRetries = 5;
+  final Map<String, Media> _mediaCache = {};
 
   String getVideoAssetPath(String id) {
-    debugPrint('getVideoAssetPath: id=$id');
     switch (id) {
       case '0':
         return settingsService.settings!.jpIdFrequentVideoPath;
       case '1':
-          return settingsService.settings!.jpIdDailyVideoPath;
+        return settingsService.settings!.jpIdDailyVideoPath;
       case '2':
-       return settingsService.settings!.jpIdDozenVideoPath;
-
+        return settingsService.settings!.jpIdDozenVideoPath;
       case '3':
         return settingsService.settings!.jpIdWeeklyVideoPath;
-
       case '4':
-         return settingsService.settings!.jpIdVegasVideoPath;
-      case '34':
-         return settingsService.settings!.jpIdDailygoldenVideoPath;
-      case '35':
-         return settingsService.settings!.jpIdTrippleVideoPath;
-
-      case '45':
-         return settingsService.settings!.jpIdHighlimitVideoPath;
-      case '46':
-         return settingsService.settings!.jpIdVegasVideoPath;
       case '44':
-         return settingsService.settings!.jpIdVegasVideoPath;
-      case '80':
+      case '46':
+        return settingsService.settings!.jpIdVegasVideoPath;
+      case '34':
+        return settingsService.settings!.jpIdDailygoldenVideoPath;
+      case '35':
+        return settingsService.settings!.jpIdTrippleVideoPath;
+      case '45':
+        return settingsService.settings!.jpIdHighlimitVideoPath;
+      case '80': //tripple 777 price
       case '81':
+        return settingsService.settings!.jpIdTrippleVideoPath;
       case '88':
       case '89':
+        return settingsService.settings!.jpId10001stVideoPath;
       case '97':
       case '98':
-        return   settingsService.settings!.jpIdPpochiMonFriVideoPath;
+        return settingsService.settings!.jpIdPpochiMonFriVideoPath;
+      case '109':
+      case '119':
+        return settingsService.settings!.jpIdNew20PpochiVideoPath;
       default:
-        debugPrint('Unknown id: $id, falling back to frequent.mpg');
-        return  settingsService.settings!.jpIdFrequentVideoPath;
+        return settingsService.settings!.jpIdFrequentVideoPath;
     }
   }
 
   @override
   void initState() {
     super.initState();
-    debugPrint('Initializing JackpotBackgroundVideoHitWindow');
+    MediaKit.ensureInitialized();
 
     // Initialize fade animation
     _fadeController = AnimationController(
-      duration: Duration(milliseconds: ConfigCustom.switchBetweeScreenDurationForHitScreen),
+      duration: Duration(milliseconds: ConfigCustom.switchBetweeScreenDurationForHitScreen.clamp(500, 1000)),
       vsync: this,
     );
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -100,48 +100,66 @@ class _JackpotBackgroundVideoHitWindowFadeAnimationState extends State<JackpotBa
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadVideo(getVideoAssetPath(widget.id));
     });
+
+    // Handle errors
+    _player.stream.error.listen((error) {
+      if (mounted && _retryCount < _maxRetries) {
+        _retryCount++;
+        Future.delayed(const Duration(seconds: 2), () {
+          if (mounted) {
+            _loadVideo(_currentVideoPath ?? getVideoAssetPath(widget.id));
+          }
+        });
+      }
+    });
   }
 
   @override
-  void didUpdateWidget(JackpotBackgroundVideoHitWindowFadeAnimation oldWidget) {
+  void didUpdateWidget(JackpotBackgroundVideoHitWindowFadeAnimationV2 oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.id != oldWidget.id) {
-      debugPrint('ID changed from ${oldWidget.id} to ${widget.id}');
       _loadVideo(getVideoAssetPath(widget.id));
     }
   }
 
   Future<void> _loadVideo(String videoPath) async {
-    if (_currentVideoPath == videoPath) {
-      debugPrint('Video unchanged: $videoPath, skipping load');
+    if (_currentVideoPath == videoPath || _isSwitching) {
+      if (_player.state.playing) return;
+      await _player.play();
       return;
     }
 
-    debugPrint('Loading video: $videoPath');
-    _currentVideoPath = videoPath;
-
+    _isSwitching = true;
     try {
-      await _player.open(Media('asset:///$videoPath'), play: false);
-      debugPrint('Setting playlist mode and volume');
-      await _player.setPlaylistMode(PlaylistMode.loop);
+      _fadeController.reset();
+      await _player.pause();
+      await Future.delayed(const Duration(milliseconds: 500)); // Delay to stabilize libmpv
+      _currentVideoPath = videoPath;
+      Media media = _mediaCache.putIfAbsent(videoPath, () => Media('asset://$videoPath'));
+      await _player.open(media, play: false);
       await _player.setVolume(100.0);
-      debugPrint('Playing video');
       await _player.play();
-
       if (mounted) {
-        // Trigger fade-in
-        _fadeController.reset();
-        await _fadeController.forward();
-        debugPrint('Fade-in complete');
+        _fadeController.forward();
       }
-    } catch (error) {
-      debugPrint('Error loading video: $error');
+      _retryCount = 0;
+    } catch (error, stackTrace) {
+      if (mounted && _retryCount < _maxRetries) {
+        _retryCount++;
+        Future.delayed(const Duration(seconds: 2), () {
+          if (mounted) {
+            _loadVideo(videoPath);
+          }
+        });
+      }
+    } finally {
+      _isSwitching = false;
     }
   }
 
   @override
   void dispose() {
-    debugPrint('Disposing JackpotBackgroundVideoHitWindow');
+    _player.pause();
     _player.dispose();
     _fadeController.dispose();
     super.dispose();
@@ -168,11 +186,13 @@ class _JackpotBackgroundVideoHitWindowFadeAnimationState extends State<JackpotBa
         Positioned(
           left: 0,
           right: 0,
-          top: screenSize.height/2  - settingsService.settings!.textHitPriceSize*0.935,
+          top: screenSize.height / 2 - settingsService.settings!.textHitPriceSize * 0.935,
           child: Container(
             alignment: Alignment.center,
             child: Text(
-             (widget.value =='0.00' || widget.value =='0' || widget.value=='0.0')? "" : '\$${_numberFormat.format(num.parse(widget.value))}',
+              (widget.value == '0.00' || widget.value == '0' || widget.value == '0.0')
+                  ? ""
+                  : '\$${_numberFormat.format(num.parse(widget.value))}',
               style: textStyleJPHit,
               textAlign: TextAlign.center,
             ),

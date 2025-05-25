@@ -46,7 +46,7 @@ class _JackpotBackgroundShowWindowFadeAnimateState extends State<JackpotBackgrou
     _controller = VideoController(
       _player,
       configuration: const VideoControllerConfiguration(
-        enableHardwareAcceleration: true,
+        enableHardwareAcceleration: false,
       ),
     );
 
@@ -55,22 +55,6 @@ class _JackpotBackgroundShowWindowFadeAnimateState extends State<JackpotBackgrou
       _loadVideo(ConfigCustom.videoBg);
     });
 
-    // Listen to player state to handle initialization
-    _player.stream.error.listen((error) {
-      debugPrint('Player error: $error');
-      if (mounted) {
-        setState(() {
-          _isInitialized = false;
-          _currentVideoPath = null;
-        });
-        // Retry loading after a delay
-        Future.delayed(const Duration(seconds: 1), () {
-          if (mounted) {
-            _loadVideo(ConfigCustom.videoBg);
-          }
-        });
-      }
-    });
 
     _player.stream.playing.listen((playing) {
       debugPrint('Player playing state: $playing');
@@ -154,7 +138,7 @@ class _JackpotBackgroundShowWindowFadeAnimateState extends State<JackpotBackgrou
       debugPrint('Screen size unchanged, skipping layout rebuild');
     } else {
       _lastScreenSize = screenSize;
-      debugPrint('Screen size updated: ${screenSize.width}x${screenSize.height}');
+      // debugPrint('Screen size updated: ${screenSize.width}x${screenSize.height}');
     }
 
     return BlocSelector<VideoBloc, ViddeoState, String>(

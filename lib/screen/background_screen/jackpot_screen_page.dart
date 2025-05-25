@@ -17,9 +17,11 @@ class JackpotDisplayScreen extends StatelessWidget {
     return BlocBuilder<VideoBloc, ViddeoState>(
       buildWhen: (previous, current) => previous.id != current.id,
       builder: (context, state) {
-        // debugPrint('JackpotDisplayScreen rebuilt: id=${state.id}');
         return BlocBuilder<JackpotPriceBloc, JackpotPriceState>(
-          buildWhen: (previous, current) => previous.isConnected != current.isConnected || previous.error != current.error,
+          buildWhen: (previous, current) =>
+              previous.isConnected != current.isConnected ||
+              previous.error != current.error ||
+              previous.jackpotValues != current.jackpotValues,
           builder: (context, priceState) {
             return Center(
               child: priceState.isConnected
@@ -40,7 +42,7 @@ class JackpotDisplayScreen extends StatelessWidget {
   }
 
   Widget screen1(BuildContext context) {
-    return   Stack(
+    return Stack(
       children: [
         Positioned(
           top: settingsService.settings!.jpWeeklyScreen1DY,
@@ -68,7 +70,7 @@ class JackpotDisplayScreen extends StatelessWidget {
         ),
         Positioned(
           top: settingsService.settings!.jpDailyScreen1DY,
-          right:settingsService.settings!.jpDailyScreen1DX,
+          right: settingsService.settings!.jpDailyScreen1DX,
           child: const JackpotOdometer(
             nameJP: "Daily",
             valueKey: 'Daily',
@@ -76,7 +78,7 @@ class JackpotDisplayScreen extends StatelessWidget {
         ),
         Positioned(
           top: settingsService.settings!.jpFrequentScreen1DY,
-          right:settingsService.settings!.jpFrequentScreen1DX,
+          right: settingsService.settings!.jpFrequentScreen1DX,
           child: const JackpotOdometer(
             nameJP: "Frequent",
             valueKey: 'Frequent',
@@ -87,12 +89,12 @@ class JackpotDisplayScreen extends StatelessWidget {
   }
 
   Widget screen2(BuildContext context) {
-    return   Stack(
+    return Stack(
       children: [
         Positioned(
           top: settingsService.settings!.jpVegasScreen2DY,
           left: settingsService.settings!.getJpVegasScreen1DX,
-          child:const JackpotOdometer(
+          child: const JackpotOdometer(
             nameJP: "Vegas",
             valueKey: 'Vegas',
           ),
@@ -100,7 +102,7 @@ class JackpotDisplayScreen extends StatelessWidget {
         Positioned(
           top: settingsService.settings!.jpMonthlyScreen2DY,
           right: settingsService.settings!.jpMonthlyScreen2DX,
-          child:const JackpotOdometer(
+          child: const JackpotOdometer(
             nameJP: "Monthly",
             valueKey: 'Monthly',
           ),
@@ -116,7 +118,7 @@ class JackpotDisplayScreen extends StatelessWidget {
         Positioned(
           top: settingsService.settings!.jpTrippleScreen2DY,
           right: settingsService.settings!.jpTrippleScreen2DX,
-          child:const JackpotOdometer(
+          child: const JackpotOdometer(
             nameJP: "Triple",
             valueKey: 'Triple',
           ),
@@ -158,11 +160,9 @@ class JackpotOdometer extends StatelessWidget {
       selector: (state) {
         final startValue = state.previousJackpotValues[valueKey] ?? 0.0;
         final endValue = state.jackpotValues[valueKey] ?? 0.0;
-        // debugPrint('JackpotOdometer selector: $valueKey, startValue=$startValue, endValue=$endValue');
         return (startValue: startValue, endValue: endValue);
       },
       builder: (context, values) {
-        // debugPrint('JackpotOdometer rebuilt: $valueKey, endValue=${values.endValue}');
         return GameOdometerChildStyleOptimized(
           startValue: values.startValue,
           endValue: values.endValue,
