@@ -58,14 +58,17 @@ class _JackpotBackgroundVideoHitWindowFadeAnimationV2State extends State<Jackpot
         return settingsService.settings!.jpIdHighlimitVideoPath;
       case '80': //tripple 777 price
       case '81':
-        return settingsService.settings!.jpIdTrippleVideoPath;
+        return settingsService.settings!.jpId7771stVideoPath;
       case '88':
+        return settingsService.settings!.jpId10001stVideoPath;
       case '89':
         return settingsService.settings!.jpId10001stVideoPath;
       case '97':
+        return settingsService.settings!.jpIdPpochiMonFriVideoPath;
       case '98':
         return settingsService.settings!.jpIdPpochiMonFriVideoPath;
       case '109':
+        return settingsService.settings!.jpIdNew20PpochiVideoPath;
       case '119':
         return settingsService.settings!.jpIdNew20PpochiVideoPath;
       default:
