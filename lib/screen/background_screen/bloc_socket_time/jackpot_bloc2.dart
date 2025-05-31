@@ -18,8 +18,8 @@ class JackpotBloc2 extends Bloc<JackpotEvent2, JackpotState2> {
       'transports': ['websocket'],
       'autoConnect': true,
       'reconnection': true,
-      'reconnectionAttempts': 1000, // Retry indefinitely
-      'reconnectionDelay': 5000,
+      'reconnectionAttempts': 100, // Retry indefinitely
+      'reconnectionDelay': 120000,
       'reconnectionDelayMax': 10000,
       'forceNew': true, // For Socket.IO v2 compatibility
     });

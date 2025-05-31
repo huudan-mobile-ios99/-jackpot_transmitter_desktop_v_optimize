@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:playtech_transmitter_app/screen/background_screen/hive_page.dart';
+import 'package:playtech_transmitter_app/screen/background_screen/hive_page.dart';
+
 import 'package:playtech_transmitter_app/service/config_custom.dart';
 import 'package:playtech_transmitter_app/service/widget/circlar_progress.dart';
 import 'package:playtech_transmitter_app/screen/background_screen/bloc/video_bloc.dart';
@@ -38,7 +41,7 @@ class _JackpotBackgroundShowWindowFadeAnimateV2State extends State<JackpotBackgr
 
     // Initialize fade animation
     _fadeController = AnimationController(
-      duration: Duration(milliseconds: ConfigCustom.switchBetweeScreenDuration.clamp(500, 1000)),
+      duration: Duration(milliseconds: ConfigCustom.switchBetweeScreenDuration),
       vsync: this,
     );
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -103,7 +106,7 @@ class _JackpotBackgroundShowWindowFadeAnimateV2State extends State<JackpotBackgr
     try {
       _fadeController.reset();
       await _player.pause();
-      await Future.delayed(const Duration(milliseconds: 500)); // Delay to stabilize libmpv
+      await Future.delayed( Duration(milliseconds: ConfigCustom.switchBetweeScreenDuration)); // Delay to stabilize libmpv
       _currentVideoPath = videoPath;
       final media = videoPath == ConfigCustom.videoBg ? _media1 : _media2;
       await _player.open(media, play: false);
@@ -113,7 +116,7 @@ class _JackpotBackgroundShowWindowFadeAnimateV2State extends State<JackpotBackgr
         _fadeController.forward();
       }
       _retryCount = 0;
-    } catch (error, stackTrace) {
+    } catch (error) {
       if (mounted && _retryCount < _maxRetries) {
         _retryCount++;
         setState(() {
@@ -158,30 +161,34 @@ class _JackpotBackgroundShowWindowFadeAnimateV2State extends State<JackpotBackgr
         if (_currentVideoPath != currentVideo && context.read<JackpotBloc2>().state is! JackpotHitReceived) {
           _loadVideo(currentVideo);
         }
-        return Center(
-          child: AspectRatio(
-            aspectRatio: ConfigCustom.fixWidth / ConfigCustom.fixHeight,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                _isInitialized
-                    ? RepaintBoundary(
-                        child: FadeTransition(
-                          opacity: _fadeAnimation,
-                          child: Video(
-                            fill: Colors.transparent,
-                            controls: (state) => Container(),
-                            controller: _controller,
-                            fit: BoxFit.contain,
-                            width: ConfigCustom.fixWidth,
-                            height: ConfigCustom.fixHeight,
-                          ),
+        return AspectRatio(
+          aspectRatio: ConfigCustom.fixWidth / ConfigCustom.fixHeight,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              _isInitialized
+                  ? RepaintBoundary(
+                      child: FadeTransition(
+                        opacity: _fadeAnimation,
+                        child: Video(
+                          fill: Colors.transparent,
+                          controls: (state) => Container(),
+                          controller: _controller,
+                          fit: BoxFit.contain,
+                          width: ConfigCustom.fixWidth,
+                          height: ConfigCustom.fixHeight,
                         ),
-                      )
-                    : circularProgessCustom(),
-                RepaintBoundary(child: JackpotDisplayScreen()),
-              ],
-            ),
+                      ),
+                    )
+                  : circularProgessCustom(),
+              const RepaintBoundary(child: JackpotDisplayScreen()),
+
+
+              //Display Hive Saved Data PREV
+              //  Positioned(
+              //   top:0,left:0,
+              //   child: RepaintBoundary(child:  HiveViewPage()))
+            ],
           ),
         );
       },

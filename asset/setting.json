@@ -29,7 +29,7 @@
   "text_hit_number_offset_dy":2,
   "text_hit__number_blur_radius":4,
   "text_hit_number_size":55,
-  "text_hit_number_dX":100,
+  "text_hit_number_dX":68,
   "text_hit_number_dY":30,
 
 
@@ -91,19 +91,19 @@
   "jp_id_tripple": 35,
   "jp_id_tripple_video_path": "asset/video/tripple.mpg",
   "hotseat_id_777_1st": 80,
-  "jp_id_777_1st_video_path": "asset/video/tripple777.mpg",
+  "jp_id_777_1st_video_path": "asset/video/tripple777.mp4",
   "hotseat_id_777_2nd": 81,
-  "jp_id_777_2nd_video_path": "asset/video/tripple777.mpg",
+  "jp_id_777_2nd_video_path": "asset/video/tripple777.mp4",
   "hotseat_id_1000_1st": 88,
   "jp_id_1000_1st_video_path": "asset/video/1000.mpg",
   "hotseat_id_1000_2nd": 89,
   "jp_id_1000_2nd_video_path": "asset/video/1000.mpg",
   "hotseat_id_ppochi_Mon_Fri": 97,
-  "jp_id_ppochi_Mon_Fri_video_path": "asset/video/ppochi.mpg",
+  "jp_id_ppochi_Mon_Fri_video_path": "asset/video/ppochi.mp4",
   "hotseat_id_ppochi_Sat_Sun": 98,
-  "jp_id_ppochi_Sat_Sun_video_path": "asset/video/ppochi.mpg",
+  "jp_id_ppochi_Sat_Sun_video_path": "asset/video/ppochi.mp4",
   "hotseat_id_RL_ppochi": 109,
-  "jp_id_RL_ppochi_video_path": "asset/video/ppochi_slot.mpg",
+  "jp_id_RL_ppochi_video_path": "asset/video/ppochi_rl.mp4",
   "hotseat_id_New_20_ppochi": 119,
-  "jp_id_New_20_ppochi_video_path": "asset/video/ppochi_slot.mpg"
+  "jp_id_New_20_ppochi_video_path": "asset/video/ppochi_slot.mp4"
 }

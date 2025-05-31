@@ -143,7 +143,7 @@ class _JackpotHitShowScreenV2State extends State<JackpotHitShowScreenV2>
         _fadeController.forward();
       }
       _retryCount = 0;
-    } catch (error, stackTrace) {
+    } catch (error) {
       if (mounted && _retryCount < _maxRetries) {
         _retryCount++;
         Future.delayed(const Duration(seconds: 2), () {

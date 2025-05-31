@@ -47,7 +47,9 @@ class _JackpotBackgroundVideoHitWindowFadeAnimationV2State extends State<Jackpot
       case '3':
         return settingsService.settings!.jpIdWeeklyVideoPath;
       case '4':
+       return settingsService.settings!.jpIdVegasVideoPath;
       case '44':
+       return settingsService.settings!.jpIdVegasVideoPath;
       case '46':
         return settingsService.settings!.jpIdVegasVideoPath;
       case '34':
@@ -57,18 +59,19 @@ class _JackpotBackgroundVideoHitWindowFadeAnimationV2State extends State<Jackpot
       case '45':
         return settingsService.settings!.jpIdHighlimitVideoPath;
       case '80': //tripple 777 price
+        return settingsService.settings!.jpId7771stVideoPath;
       case '81':
         return settingsService.settings!.jpId7771stVideoPath;
-      case '88':
+      case '88': //1000 price jackpot town
         return settingsService.settings!.jpId10001stVideoPath;
       case '89':
         return settingsService.settings!.jpId10001stVideoPath;
-      case '97':
+      case '97': //ppochi video
         return settingsService.settings!.jpIdPpochiMonFriVideoPath;
       case '98':
         return settingsService.settings!.jpIdPpochiMonFriVideoPath;
       case '109':
-        return settingsService.settings!.jpIdNew20PpochiVideoPath;
+        return settingsService.settings!.jpIdRlPpochiVideoPath;
       case '119':
         return settingsService.settings!.jpIdNew20PpochiVideoPath;
       default:
@@ -146,7 +149,7 @@ class _JackpotBackgroundVideoHitWindowFadeAnimationV2State extends State<Jackpot
         _fadeController.forward();
       }
       _retryCount = 0;
-    } catch (error, stackTrace) {
+    } catch (error) {
       if (mounted && _retryCount < _maxRetries) {
         _retryCount++;
         Future.delayed(const Duration(seconds: 2), () {

@@ -88,31 +88,33 @@ class SlideOdometerTransition extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       child: Center(
-        child: OdometerTransition(
-          odometerAnimation: odometerAnimation,
-          transitionIn: (value, place, animation) => _buildSlideOdometerDigit(
-            value,
-            place,
-            animation.clamp(0.8, 1.0), // Simplified opacity
-            verticalOffset * (1.0 - animation), // Bottom to top
-            groupSeparator,
-            decimalSeparator,
-            numberTextStyle,
-            letterWidth,
-            decimalPlaces,
-            integerDigits,
-          ),
-          transitionOut: (value, place, animation) => _buildSlideOdometerDigit(
-            value,
-            place,
-            (1.0 - animation).clamp(0.8, 1.0), // Simplified opacity
-            verticalOffset * -animation, // Bottom to top
-            groupSeparator,
-            decimalSeparator,
-            numberTextStyle,
-            letterWidth,
-            decimalPlaces,
-            integerDigits,
+        child: RepaintBoundary(
+          child: OdometerTransition(
+            odometerAnimation: odometerAnimation,
+            transitionIn: (value, place, animation) => _buildSlideOdometerDigit(
+              value,
+              place,
+              animation, // Simplified opacity
+              verticalOffset * (1.0 - animation), // Bottom to top
+              groupSeparator,
+              decimalSeparator,
+              numberTextStyle,
+              letterWidth,
+              decimalPlaces,
+              integerDigits,
+            ),
+            transitionOut: (value, place, animation) => _buildSlideOdometerDigit(
+              value,
+              place,
+              (1.0 - animation), // Simplified opacity
+              verticalOffset * -animation, // Bottom to top
+              groupSeparator,
+              decimalSeparator,
+              numberTextStyle,
+              letterWidth,
+              decimalPlaces,
+              integerDigits,
+            ),
           ),
         ),
       ),

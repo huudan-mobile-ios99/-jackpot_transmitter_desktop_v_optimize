@@ -1,4 +1,3 @@
-
 // import 'package:flutter/widgets.dart';
 // import 'package:playtech_transmitter_app/odometer/odometer_number.dart';
 // import 'package:playtech_transmitter_app/odometer/odometer_transition.dart';
@@ -13,7 +12,7 @@
 //   final double verticalOffset;
 //   final Curve curve;
 //   final int decimalPlaces;
-//   final int integerDigits; // New parameter for cached integer digits
+//   final int integerDigits;
 
 //   const AnimatedSlideOdometerNumber({
 //     super.key,
@@ -25,8 +24,8 @@
 //     this.verticalOffset = 20,
 //     this.groupSeparator,
 //     this.decimalSeparator,
-//     this.decimalPlaces = 2, // Default to 2 decimal places
-//     required this.integerDigits, // Required cached integer digits
+//     this.decimalPlaces = 2,
+//     required this.integerDigits,
 //   });
 
 //   @override
@@ -38,25 +37,25 @@
 //         value,
 //         place,
 //         animation,
-//         verticalOffset * animation - verticalOffset,
+//         verticalOffset * animation - verticalOffset, // Bottom to top
 //         groupSeparator,
 //         decimalSeparator,
 //         numberTextStyle,
 //         letterWidth,
 //         decimalPlaces,
-//         integerDigits, // Pass cached integer digits
+//         integerDigits,
 //       ),
 //       transitionOut: (value, place, animation) => _buildSlideOdometerDigit(
 //         value,
 //         place,
 //         1 - animation,
-//         verticalOffset * animation,
+//         verticalOffset * animation, // Bottom to top
 //         groupSeparator,
 //         decimalSeparator,
 //         numberTextStyle,
 //         letterWidth,
 //         decimalPlaces,
-//         integerDigits, // Pass cached integer digits
+//         integerDigits,
 //       ),
 //       duration: duration,
 //     );
@@ -71,7 +70,7 @@
 //   final TextStyle? numberTextStyle;
 //   final double verticalOffset;
 //   final int decimalPlaces;
-//   final int integerDigits; // New parameter for cached integer digits
+//   final int integerDigits;
 
 //   const SlideOdometerTransition({
 //     super.key,
@@ -81,8 +80,8 @@
 //     this.verticalOffset = 20,
 //     this.groupSeparator,
 //     this.decimalSeparator,
-//     this.decimalPlaces = 2, // Default to 2 decimal places
-//     required this.integerDigits, // Required cached integer digits
+//     this.decimalPlaces = 2,
+//     required this.integerDigits,
 //   });
 
 //   @override
@@ -94,26 +93,26 @@
 //           transitionIn: (value, place, animation) => _buildSlideOdometerDigit(
 //             value,
 //             place,
-//             animation < 0.02 ? 0.85 + (animation / 0.02) * (1.0 - 0.85) : 1.0,
-//             verticalOffset * (1.0 - animation),
+//             animation, // Simplified opacity
+//             verticalOffset * (1.0 - animation), // Bottom to top
 //             groupSeparator,
 //             decimalSeparator,
 //             numberTextStyle,
 //             letterWidth,
 //             decimalPlaces,
-//             integerDigits, // Pass cached integer digits
+//             integerDigits,
 //           ),
 //           transitionOut: (value, place, animation) => _buildSlideOdometerDigit(
 //             value,
 //             place,
-//             animation <= 0.99 ? 1.0 : 1 - ((animation - 0.99) / 0.1).clamp(0.0, 1.0),
-//             verticalOffset * (animation * -1),
+//             (1.0 - animation), // Simplified opacity
+//             verticalOffset * -animation, // Bottom to top
 //             groupSeparator,
 //             decimalSeparator,
 //             numberTextStyle,
 //             letterWidth,
 //             decimalPlaces,
-//             integerDigits, // Pass cached integer digits
+//             integerDigits,
 //           ),
 //         ),
 //       ),
@@ -131,11 +130,10 @@
 //   TextStyle? numberTextStyle,
 //   double letterWidth,
 //   int decimalPlaces,
-//   int integerDigits, // Use cached integer digits
+//   int integerDigits,
 // ) {
 //   Widget digitWidget = _valueText(value, opacity, offsetY, numberTextStyle, letterWidth);
 
-//   // Place decimal separator after integer digits
 //   if (decimalSeparator != null && place == integerDigits + decimalPlaces) {
 //     return Row(
 //       mainAxisSize: MainAxisSize.min,
@@ -148,7 +146,6 @@
 //     );
 //   }
 
-//   // Place group separator for integer part
 //   final d = place - decimalPlaces - integerDigits;
 //   if (groupSeparator != null && place > decimalPlaces + integerDigits && d > 0 && d % 4 == 0) {
 //     return Row(
@@ -174,15 +171,12 @@
 // ) =>
 //     Transform.translate(
 //       offset: Offset(0, offsetY),
-//       child: Opacity(
-//         opacity: opacity.clamp(0.5, 1.0),
-//         child: SizedBox(
-//           width: letterWidth,
-//           child: Text(
-//             value.toString(),
-//             textAlign: TextAlign.center,
-//             style: numberTextStyle,
-//           ),
+//       child: SizedBox(
+//         width: letterWidth,
+//         child: Text(
+//           value.toString(),
+//           textAlign: TextAlign.center,
+//           style: numberTextStyle,
 //         ),
 //       ),
-// );
+//     );

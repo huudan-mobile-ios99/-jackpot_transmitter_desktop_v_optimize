@@ -61,17 +61,18 @@
       "port": 12310
     },
     {
-      "id": "0",
-      "name": "Frequent",
-      "address": "192.168.101.255",
-      "port": 12300
-    },
-    {
       "id": "43",
       "name": "Vegas Spin  JP",
       "address": "192.168.101.255",
       "port": 12311
+    },
+    {
+      "id": "0",
+      "name": "Frequent",
+      "address": "192.168.101.255",
+      "port": 12300
     }
+
   ],
   "hotseats": [
     {
