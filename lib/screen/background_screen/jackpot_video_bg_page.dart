@@ -4,7 +4,7 @@ import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:playtech_transmitter_app/service/config_custom.dart';
 import 'package:playtech_transmitter_app/service/widget/circlar_progress.dart';
-import 'package:playtech_transmitter_app/screen/background_screen/bloc/video_bloc.dart';
+import 'package:playtech_transmitter_app/screen/background_screen/bloc/video_blocv1.dart';
 import 'package:playtech_transmitter_app/screen/background_screen/jackpot_screen_page.dart';
 import 'package:playtech_transmitter_app/screen/background_screen/bloc_socket_time/jackpot_bloc2.dart';
 import 'package:playtech_transmitter_app/screen/background_screen/bloc_socket_time/jackpot_event2.dart';

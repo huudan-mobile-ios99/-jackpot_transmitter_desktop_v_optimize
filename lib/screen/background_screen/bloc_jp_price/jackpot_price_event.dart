@@ -12,3 +12,9 @@ class JackpotPriceConnectionEvent extends JackpotPriceEvent {
   final String? error;
   JackpotPriceConnectionEvent(this.isConnected, {this.error});
 }
+
+
+class JackpotPriceResetEvent extends JackpotPriceEvent {
+  final String level;
+  JackpotPriceResetEvent(this.level);
+}

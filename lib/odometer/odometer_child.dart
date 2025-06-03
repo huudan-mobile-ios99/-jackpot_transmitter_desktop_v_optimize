@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:playtech_transmitter_app/odometer/odometer_number.dart';
 import 'package:playtech_transmitter_app/odometer/slide_odometer.dart';
 import 'package:playtech_transmitter_app/service/config_custom.dart';
@@ -34,10 +35,11 @@ class _GameOdometerChildStyleOptimizedState extends State<GameOdometerChildStyle
   late ValueNotifier<double> currentValueNotifier;
   final SettingsService settingsService = SettingsService();
   late int durationPerStep;
-  late int durationPerStepFirst;
+  late int durationPerStepHive;
   Timer? _animationTimer;
   final String fontFamily = 'sf-pro-display';
   bool _isFirstRun = true; // Flag to use hiveValue on first run
+  Logger _logger = Logger();
 
   @override
   void initState() {
@@ -50,15 +52,15 @@ class _GameOdometerChildStyleOptimizedState extends State<GameOdometerChildStyle
       startValue: initialValue,
       endValue: widget.endValue,
     );
-    durationPerStepFirst = calculationDurationPerStep(
+    durationPerStepHive = calculationDurationPerStep(
       totalDuration: widget.totalDuration!,
       startValue: widget.hiveValue,
       endValue: widget.endValue,
     );
+
     _initializeAnimationController();
     _updateAnimation(currentValueNotifier.value, currentValueNotifier.value);
-    // _isFirstRun? print('first run') : print('next run');
-
+    // _isFirstRun? debugPrint('#FirstRun') : debugPrint('#NextRun');
   }
 
   void _initializeAnimationController() {
@@ -80,9 +82,44 @@ class _GameOdometerChildStyleOptimizedState extends State<GameOdometerChildStyle
     );
   }
 
+
+
+
+
+  @override
+  void didUpdateWidget(covariant GameOdometerChildStyleOptimized oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.startValue != oldWidget.startValue || widget.endValue != oldWidget.endValue || widget.totalDuration != oldWidget.totalDuration) {
+      _animationTimer?.cancel();
+      currentValueNotifier.value = widget.startValue == 0.0 ? widget.endValue : widget.startValue;
+      durationPerStep = calculationDurationPerStep(
+        totalDuration: widget.totalDuration!,
+        startValue:_isFirstRun==true ? widget.hiveValue :  widget.startValue,
+        endValue: widget.endValue,
+      );
+
+      animationController
+        ..stop()
+        ..duration = Duration(milliseconds: durationPerStep);
+       _updateAnimation(currentValueNotifier.value, currentValueNotifier.value);
+
+
+      if (_isFirstRun == true && widget.hiveValue > 0 && widget.hiveValue < widget.endValue) {
+        _startAutoAnimation(widget.hiveValue);
+      }
+      if (widget.startValue != 0.0  || widget.startValue !=0) {
+        _startAutoAnimation(widget.startValue);
+      }
+      _isFirstRun = false; // Disable hiveValue after first run
+    }
+  }
+
+
+
+
   void _startAutoAnimation(double startValue) {
     const increment = 0.01;
-    final interval = Duration(milliseconds:  durationPerStep.clamp(35, 7500));
+    final interval = Duration(milliseconds:  durationPerStep.clamp(15, 75000));
     _animationTimer?.cancel();
     currentValueNotifier.value = startValue;
     _updateAnimation(startValue, startValue);
@@ -96,35 +133,6 @@ class _GameOdometerChildStyleOptimizedState extends State<GameOdometerChildStyle
       currentValueNotifier.value = nextValue;
       animationController.forward(from: 0.0);
     });
-  }
-
-
-
-  @override
-  void didUpdateWidget(covariant GameOdometerChildStyleOptimized oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.startValue != oldWidget.startValue || widget.endValue != oldWidget.endValue || widget.totalDuration != oldWidget.totalDuration) {
-      _animationTimer?.cancel();
-      // Use startValue from bloc for updates, not hiveValue
-      currentValueNotifier.value = widget.startValue == 0.0 ? widget.endValue : widget.startValue;
-      durationPerStep = calculationDurationPerStep(
-        totalDuration: widget.totalDuration!,
-        startValue: widget.startValue,
-        endValue: widget.endValue,
-      );
-      animationController
-        ..stop()
-        ..duration = Duration(milliseconds: durationPerStep);
-      _updateAnimation(currentValueNotifier.value, currentValueNotifier.value);
-      // _startAutoAnimation(widget.startValue);
-      // if(_isFirstRun==true && widget.hiveValue>0 && widget.hiveValue< widget.endValue){
-      //   _startAutoAnimation(widget.hiveValue);
-      // }
-      if (widget.startValue != 0.0) {
-        _startAutoAnimation(widget.startValue);
-      }
-      _isFirstRun = false; // Disable hiveValue after first run
-    }
   }
 
   @override
@@ -188,5 +196,5 @@ int calculationDurationPerStep({
   }
   final totalSteps = ((endValue - startValue) / 0.01).ceil();
   final durationMs = (totalDuration * 1000) / totalSteps;
-  return durationMs.round().clamp(35, 7500);
+  return durationMs.round().clamp(15, 75000);
 }

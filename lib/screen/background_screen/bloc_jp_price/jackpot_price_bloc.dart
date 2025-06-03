@@ -12,28 +12,18 @@ class JackpotPriceBloc extends Bloc<JackpotPriceEvent, JackpotPriceState> {
   late IOWebSocketChannel channel;
   final int secondToReconnect = ConfigCustom.secondToReConnect;
   final List<String> _unknownLevels = [];
-  // Track first update for each jackpot type
   final Map<String, bool> _isFirstUpdate = {
-    'Frequent': true,
-    'Daily': true,
-    'Dozen': true,
-    'Weekly': true,
-    'HighLimit': true,
-    'DailyGolden': true,
-    'Triple': true,
-    'Monthly': true,
-    'Vegas': true,
+    for (var name in ConfigCustom.validJackpotNames) name: true,
   };
   Map<String, double> _currentBatchValues = {};
-
-  // Track last processed timestamp for debouncing
   final Map<String, DateTime> _lastUpdateTime = {};
-  static  final Duration _debounceDuration =  Duration(seconds: ConfigCustom.durationGetDataToBloc);
-  static  final Duration _firstUpdateDelay = Duration(milliseconds:ConfigCustom.durationGetDataToBlocFirstMS);
+  static final Duration _debounceDuration = Duration(seconds: ConfigCustom.durationGetDataToBloc);
+  static final Duration _firstUpdateDelay = Duration(milliseconds: ConfigCustom.durationGetDataToBlocFirstMS);
   final hiveService = JackpotHiveService();
 
   JackpotPriceBloc() : super(JackpotPriceState.initial()) {
     on<JackpotPriceUpdateEvent>(_onUpdate);
+    on<JackpotPriceResetEvent>(_onReset);
     on<JackpotPriceConnectionEvent>(_onConnection);
     debugPrint('JackpotPriceBloc: Initializing WebSocket connection to ${ConfigCustom.endpointWebSocket}');
     _connectToWebSocket();
@@ -50,60 +40,28 @@ class JackpotPriceBloc extends Bloc<JackpotPriceEvent, JackpotPriceState> {
             final data = jsonDecode(message);
             final level = data['Id'].toString();
             final value = double.tryParse(data['Value'].toString()) ?? 0.0;
-            // debugPrint('JackpotPriceBloc: $level $value');
-
-            // Map level to key
-            String? key;
-            switch (level) {
-              case "0":
-                key = 'Frequent';
-                break;
-              case "1":
-                key = 'Daily';
-                break;
-              case "2":
-                key = 'Dozen';
-                break;
-              case "3":
-                key = 'Weekly';
-                break;
-              case "45":
-                key = 'HighLimit';
-                break;
-              case "34":
-                key = 'DailyGolden';
-                break;
-              case "35":
-                key = 'Triple';
-                break;
-              case "46":
-                key = 'Monthly';
-                break;
-              case "4":
-                key = 'Vegas';
-                break;
-              default:
-                if (!_unknownLevels.contains(level)) {
-                  _unknownLevels.add(level);
-                  // debugPrint('JackpotPriceBloc: Unknown level: $level, tracked: $_unknownLevels');
-                  if (_unknownLevels.length > 5) {
-                    // debugPrint('JackpotPriceBloc: Excessive unknown levels: $_unknownLevels');
-                  }
+            final key = ConfigCustom.getJackpotNameByLevel(level);
+            if (key == null) {
+              if (!_unknownLevels.contains(level)) {
+                _unknownLevels.add(level);
+                debugPrint('JackpotPriceBloc: Unknown level: $level, tracked: $_unknownLevels');
+                if (_unknownLevels.length > 5) {
+                  debugPrint('JackpotPriceBloc: Excessive unknown levels: $_unknownLevels');
                 }
-                return;
+              }
+              return;
             }
 
-            // Update current batch
             _currentBatchValues[key] = value;
-            add(JackpotPriceUpdateEvent(level, value)); // Trigger _onUpdate for state
+            add(JackpotPriceUpdateEvent(level, value));
 
-            // Save to Hive if all 9 values are present and non-zero
-            if (_currentBatchValues.length == 9 && _currentBatchValues.values.every((v) => v != 0.0)) {
+            if (_currentBatchValues.length == ConfigCustom.validJackpotNames.length &&
+                _currentBatchValues.values.every((v) => v != 0.0)) {
               try {
                 await hiveService.initHive();
                 await hiveService.appendJackpotHistory(Map.from(_currentBatchValues));
-                // debugPrint('JackpotPriceBloc: Saved to Hive: $_currentBatchValues');
-                _currentBatchValues = {}; // Reset for next batch
+                debugPrint('JackpotPriceBloc: Saved to Hive: $_currentBatchValues');
+                _currentBatchValues = {};
               } catch (e) {
                 debugPrint('JackpotPriceBloc: Failed to save to Hive: $e');
               }
@@ -130,86 +88,77 @@ class JackpotPriceBloc extends Bloc<JackpotPriceEvent, JackpotPriceState> {
     }
   }
 
-
   Future<void> _onUpdate(JackpotPriceUpdateEvent event, Emitter<JackpotPriceState> emit) async {
     final level = event.level;
     final newValue = event.value;
-    String? key;
-    switch (level) {
-      case "0":
-        key = 'Frequent';
-        break;
-      case "1":
-        key = 'Daily';
-        break;
-      case "2":
-        key = 'Dozen';
-        break;
-      case "3":
-        key = 'Weekly';
-        break;
-      case "45":
-        key = 'HighLimit';
-        break;
-      case "34":
-        key = 'DailyGolden';
-        break;
-      case "35":
-        key = 'Triple';
-        break;
-      case "46":
-        key = 'Monthly';
-        break;
-      case "4":
-        key = 'Vegas';
-        break;
-      case "40":
-        key = 'Grand Spin JP';
-        break;
-      case "41":
-        key = 'Major Spin JP';
-        break;
-      case "43":
-        key = 'Vegas Spin JP';
-      break;
-      default:
-        if (!_unknownLevels.contains(level)) {
+    final key = ConfigCustom.getJackpotNameByLevel(level);
+    if (key == null) {
+      if (!_unknownLevels.contains(level)) {
         _unknownLevels.add(level);
         debugPrint('JackpotPriceBloc: Unknown level: $level, tracked: $_unknownLevels');
         if (_unknownLevels.length > 5) {
           debugPrint('JackpotPriceBloc: Excessive unknown levels: $_unknownLevels');
         }
-      } return;
+      }
+      return;
     }
 
-    // Check if it's the first update for this jackpot type
     final isFirst = _isFirstUpdate[key] ?? false;
     final now = DateTime.now();
     final lastUpdate = _lastUpdateTime[key];
 
-    // Skip if within debounce period (unless it's the first update)
     if (!isFirst && lastUpdate != null && now.difference(lastUpdate) < _debounceDuration) {
       debugPrint('JackpotPriceBloc: Skipping update for $key due to debounce');
       return;
     }
     await Future.delayed(isFirst ? _firstUpdateDelay : _debounceDuration);
 
-  final jackpotValues = Map<String, double>.from(state.jackpotValues);
-  final previousJackpotValues = Map<String, double>.from(state.previousJackpotValues);
+    final jackpotValues = Map<String, double>.from(state.jackpotValues);
+    final previousJackpotValues = Map<String, double>.from(state.previousJackpotValues);
 
-  // Update only if value changed
-  if (jackpotValues[key] != newValue) {
-    previousJackpotValues[key] = jackpotValues[key] ?? 0.0;
-    jackpotValues[key] = newValue;
-    _lastUpdateTime[key] = now;
-    if (isFirst) {
-      _isFirstUpdate[key] = false;
+    if (jackpotValues[key] != newValue) {
+      previousJackpotValues[key] = jackpotValues[key] ?? 0.0;
+      jackpotValues[key] = newValue;
+      _lastUpdateTime[key] = now;
+      if (isFirst) {
+        _isFirstUpdate[key] = false;
+      }
+      final validKeys = ConfigCustom.validJackpotNames.toSet();
+      jackpotValues.removeWhere((k, v) => !validKeys.contains(k));
+      previousJackpotValues.removeWhere((k, v) => !validKeys.contains(k));
+      // debugPrint('JackpotPriceBloc onUpdate: $key updated to $newValue, jackpotValues: $jackpotValues');
+      emit(state.copyWith(
+        jackpotValues: jackpotValues,
+        previousJackpotValues: previousJackpotValues,
+        isConnected: true,
+        error: null,
+      ));
+    } else {
+      // debugPrint('JackpotPriceBloc: Skipped update for $key: value unchanged ($newValue)');
     }
-    // Clean unhandled jackpot types
-    final validKeys = _isFirstUpdate.keys.toSet();
-    jackpotValues.removeWhere((k, v) => !validKeys.contains(k));
-    previousJackpotValues.removeWhere((k, v) => !validKeys.contains(k));
-    // debugPrint('JackpotPriceBloc onUpdate: $key updated to $newValue, jackpotValues: $jackpotValues');
+  }
+
+  Future<void> _onReset(JackpotPriceResetEvent event, Emitter<JackpotPriceState> emit) async {
+    final key = ConfigCustom.getJackpotNameByLevel(event.level);
+    if (key == null) {
+      debugPrint('JackpotPriceBloc: Unknown level for reset: ${event.level}');
+      return;
+    }
+
+    final resetValue = ConfigCustom.getResetValueByLevel(event.level);
+    if (resetValue == null) {
+      debugPrint('JackpotPriceBloc: No reset value found for $key');
+      return;
+    }
+
+    final jackpotValues = Map<String, double>.from(state.jackpotValues);
+    final previousJackpotValues = Map<String, double>.from(state.previousJackpotValues);
+
+    previousJackpotValues[key] = jackpotValues[key] ?? 0.0;
+    jackpotValues[key] = resetValue;
+    _lastUpdateTime[key] = DateTime.now();
+    _isFirstUpdate[key] = false;
+    debugPrint('JackpotPriceBloc: Reset $key to $resetValue');
     emit(state.copyWith(
       jackpotValues: jackpotValues,
       previousJackpotValues: previousJackpotValues,
@@ -217,9 +166,15 @@ class JackpotPriceBloc extends Bloc<JackpotPriceEvent, JackpotPriceState> {
       error: null,
     ));
 
-  } else {
-    debugPrint('JackpotPriceBloc: Skipped update for $key: value unchanged ($newValue)');
-  }
+    _currentBatchValues[key] = resetValue;
+    try {
+      await hiveService.initHive();
+      await hiveService.appendJackpotHistory(Map.from(_currentBatchValues));
+      debugPrint('JackpotPriceBloc: Saved reset to Hive: $_currentBatchValues');
+      _currentBatchValues = {};
+    } catch (e) {
+      debugPrint('JackpotPriceBloc: Failed to save reset to Hive: $e');
+    }
   }
 
   Future<void> _onConnection(JackpotPriceConnectionEvent event, Emitter<JackpotPriceState> emit) async {

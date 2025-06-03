@@ -74,6 +74,7 @@ flutter:
     - asset/video/tripple.mpg
     - asset/video/high_limit.mpg
     - asset/video/1000.mpg
+    - asset/video/monthly.mp4
     - asset/video/video_background.mp4
     - asset/video/video_background2.mp4
 

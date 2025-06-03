@@ -49,15 +49,19 @@ class _JackpotBackgroundVideoHitWindowFadeAnimationV2State extends State<Jackpot
       case '4':
        return settingsService.settings!.jpIdVegasVideoPath;
       case '44':
-       return settingsService.settings!.jpIdVegasVideoPath;
+       return settingsService.settings!.jpIdMonthlyVideoPath;
       case '46':
-        return settingsService.settings!.jpIdVegasVideoPath;
+        return settingsService.settings!.jpIdMonthlyVideoPath;
       case '34':
         return settingsService.settings!.jpIdDailygoldenVideoPath;
       case '35':
         return settingsService.settings!.jpIdTrippleVideoPath;
+
       case '45':
         return settingsService.settings!.jpIdHighlimitVideoPath;
+      case '18':
+        return settingsService.settings!.jpIdHighlimitVideoPath;
+
       case '80': //tripple 777 price
         return settingsService.settings!.jpId7771stVideoPath;
       case '81':
@@ -193,23 +197,29 @@ class _JackpotBackgroundVideoHitWindowFadeAnimationV2State extends State<Jackpot
           left: 0,
           right: 0,
           top: screenSize.height / 2 - settingsService.settings!.textHitPriceSize * 0.935,
-          child: Container(
-            alignment: Alignment.center,
-            child: Text(
-              (widget.value == '0.00' || widget.value == '0' || widget.value == '0.0')
-                  ? ""
-                  : '\$${_numberFormat.format(num.parse(widget.value))}',
-              style: textStyleJPHit,
-              textAlign: TextAlign.center,
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: Container(
+              alignment: Alignment.center,
+              child: Text(
+                (widget.value == '0.00' || widget.value == '0' || widget.value == '0.0')
+                    ? ""
+                    : '\$${_numberFormat.format(num.parse(widget.value))}',
+                style: textStyleJPHit,
+                textAlign: TextAlign.center,
+              ),
             ),
           ),
         ),
         Positioned(
           bottom: settingsService.settings!.textHitNumberDY,
           right: settingsService.settings!.textHitNumberDX,
-          child: Text(
-            '#${widget.number}',
-            style: textStyleSmall,
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: Text(
+              '#${widget.number}',
+              style: textStyleSmall,
+            ),
           ),
         ),
       ],

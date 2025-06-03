@@ -1,3 +1,5 @@
+import 'package:playtech_transmitter_app/service/config_custom.dart';
+
 final class JackpotPriceState {
   final bool isConnected;
   final String? error;
@@ -15,26 +17,10 @@ final class JackpotPriceState {
         isConnected: false,
         error: null,
         jackpotValues: {
-          'Frequent': 0.0,
-          'Daily': 0.0,
-          'DailyGolden': 0.0,
-          'Dozen': 0.0,
-          'Weekly': 0.0,
-          'HighLimit': 0.0,
-          'Triple': 0.0,
-          'Monthly': 0.0,
-          'Vegas': 0.0,
+          for (var name in ConfigCustom.validJackpotNames) name: 0.0,
         },
         previousJackpotValues: {
-          'Frequent': 0.0,
-          'Daily': 0.0,
-          'DailyGolden': 0.0,
-          'Dozen': 0.0,
-          'Weekly': 0.0,
-          'HighLimit': 0.0,
-          'Triple': 0.0,
-          'Monthly': 0.0,
-          'Vegas': 0.0,
+          for (var name in ConfigCustom.validJackpotNames) name: 0.0,
         },
       );
 

@@ -51,7 +51,7 @@ class JackpotHiveService {
     // Return the last 3 unique entries (most recent) or all if fewer than 3
     final result = history.length > 2 ? history.sublist(history.length - 2) : history;
 
-    _logger.i('Retrieved jackpot history (top 3, deduplicated): $result');
+    _logger.i('Retrieved jackpot history (TOP2: deduplicated): $result');
     return result;
   } catch (e) {
     _logger.e('Error retrieving jackpot history: $e');
@@ -94,7 +94,7 @@ class JackpotHiveService {
       if (filteredValues.length == 9) {
         history.add(filteredValues);
         await box.put(_jackpotHistoryKey, history);
-        // _logger.d('Appended to jackpotBox: $filteredValues');
+        _logger.d('Appended to jackpotBox: $filteredValues');
       } else {
         _logger.d('Skipped saving to jackpotBox: incomplete data ($filteredValues)');
       }
@@ -120,7 +120,7 @@ class JackpotHiveService {
       if (filteredValues.length == 9) {
         historyRaw.add(filteredValues);
         await box.put(_jackpotHistoryKey, historyRaw);
-        // _logger.d('Appended to jackpotBox: $filteredValues');
+        _logger.d('Appended to jackpotBox: $filteredValues');
       } else {
         _logger.d('Skipped saving to jackpotBox: incomplete data ($filteredValues)');
       }

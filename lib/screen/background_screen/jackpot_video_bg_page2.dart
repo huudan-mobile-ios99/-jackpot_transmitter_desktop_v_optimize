@@ -8,7 +8,7 @@ import 'package:playtech_transmitter_app/screen/background_screen/hive_page.dart
 
 import 'package:playtech_transmitter_app/service/config_custom.dart';
 import 'package:playtech_transmitter_app/service/widget/circlar_progress.dart';
-import 'package:playtech_transmitter_app/screen/background_screen/bloc/video_bloc.dart';
+import 'package:playtech_transmitter_app/screen/background_screen/bloc/video_blocv1.dart';
 import 'package:playtech_transmitter_app/screen/background_screen/jackpot_screen_page.dart';
 import 'package:playtech_transmitter_app/screen/background_screen/bloc_socket_time/jackpot_bloc2.dart';
 import 'package:playtech_transmitter_app/screen/background_screen/bloc_socket_time/jackpot_event2.dart';
@@ -153,13 +153,13 @@ class _JackpotBackgroundShowWindowFadeAnimateV2State extends State<JackpotBackgr
     }
   }
 
-  @override
+   @override
   Widget build(BuildContext context) {
-    return BlocSelector<VideoBloc, ViddeoState, String>(
-      selector: (state) => state.currentVideo,
-      builder: (context, currentVideo) {
-        if (_currentVideoPath != currentVideo && context.read<JackpotBloc2>().state is! JackpotHitReceived) {
-          _loadVideo(currentVideo);
+    return BlocSelector<VideoBloc, ViddeoState, ({String currentVideo, int count, bool isRestart})>(
+      selector: (state) => (currentVideo: state.currentVideo, count: state.count, isRestart: state.isRestart),
+      builder: (context, value) {
+        if (_currentVideoPath != value.currentVideo && context.read<JackpotBloc2>().state is! JackpotHitReceived) {
+          _loadVideo(value.currentVideo);
         }
         return AspectRatio(
           aspectRatio: ConfigCustom.fixWidth / ConfigCustom.fixHeight,
@@ -182,11 +182,17 @@ class _JackpotBackgroundShowWindowFadeAnimateV2State extends State<JackpotBackgr
                     )
                   : circularProgessCustom(),
               const RepaintBoundary(child: JackpotDisplayScreen()),
-
-
+              Positioned(
+                top: 10,
+                left: 10,
+                child: Text(
+                  'Cycle Count: ${value.count}, Restart: ${value.isRestart}',
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ),
               //Display Hive Saved Data PREV
               //  Positioned(
-              //   top:0,left:0,
+              //   top:0,right:0,
               //   child: RepaintBoundary(child:  HiveViewPage()))
             ],
           ),

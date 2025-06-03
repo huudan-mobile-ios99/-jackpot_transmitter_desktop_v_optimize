@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:playtech_transmitter_app/odometer/odometer_child.dart';
 import 'package:playtech_transmitter_app/service/config_custom.dart';
 import 'package:playtech_transmitter_app/screen/setting/setting_service.dart';
-import 'package:playtech_transmitter_app/screen/background_screen/bloc/video_bloc.dart';
+import 'package:playtech_transmitter_app/screen/background_screen/bloc/video_blocv1.dart';
 import 'package:playtech_transmitter_app/screen/background_screen/bloc_jp_price/jackpot_price_bloc.dart';
 import 'package:playtech_transmitter_app/screen/background_screen/bloc_jp_price/jackpot_state_state.dart';
 import 'package:playtech_transmitter_app/screen/background_screen/bloc_jp_price/jackpot_hive_service.dart';
@@ -78,45 +78,45 @@ class _JackpotDisplayScreenState extends State<JackpotDisplayScreen> {
           top: settingsService.settings!.jpWeeklyScreen1DY,
           left: settingsService.settings!.jpWeeklyScreen1DX,
           child: JackpotOdometer(
-            nameJP: "Weekly",
-            valueKey: 'Weekly',
-            hiveValue: hiveValues['Weekly'] ?? 0.0,
+            nameJP: ConfigCustom.tagWeekly,
+            valueKey: ConfigCustom.tagWeekly,
+            hiveValue: hiveValues[ConfigCustom.tagWeekly] ?? 0.0,
           ),
         ),
         Positioned(
           top: settingsService.settings!.jpDozenScreen1DY,
           right: settingsService.settings!.jpDozenScreen1DX,
           child: JackpotOdometer(
-            nameJP: "Dozen",
-            valueKey: 'Dozen',
-            hiveValue: hiveValues['Dozen'] ?? 0.0,
+            nameJP: ConfigCustom.tagDozen,
+            valueKey: ConfigCustom.tagDozen,
+            hiveValue: hiveValues[ConfigCustom.tagDozen] ?? 0.0,
           ),
         ),
         Positioned(
           top: settingsService.settings!.jpDailygoldenScreen1DY,
           left: settingsService.settings!.jpDailygoldenScreen1DX,
           child: JackpotOdometer(
-            nameJP: "Daily Golden",
-            valueKey: 'DailyGolden',
-            hiveValue: hiveValues['DailyGolden'] ?? 0.0,
+            nameJP: ConfigCustom.tagDailyGolden,
+            valueKey: ConfigCustom.tagDailyGolden,
+            hiveValue: hiveValues[ConfigCustom.tagDailyGolden] ?? 0.0,
           ),
         ),
         Positioned(
           top: settingsService.settings!.jpDailyScreen1DY,
           right: settingsService.settings!.jpDailyScreen1DX,
           child: JackpotOdometer(
-            nameJP: "Daily",
-            valueKey: 'Daily',
-            hiveValue: hiveValues['Daily'] ?? 0.0,
+            nameJP:ConfigCustom.tagDaily ,
+            valueKey: ConfigCustom.tagDaily,
+            hiveValue: hiveValues[ConfigCustom.tagDaily] ?? 0.0,
           ),
         ),
         Positioned(
           top: settingsService.settings!.jpFrequentScreen1DY,
           right: settingsService.settings!.jpFrequentScreen1DX,
           child: JackpotOdometer(
-            nameJP: "Frequent",
-            valueKey: 'Frequent',
-            hiveValue: hiveValues['Frequent'] ?? 0.0,
+            nameJP: ConfigCustom.tagFrequent,
+            valueKey: ConfigCustom.tagFrequent,
+            hiveValue: hiveValues[ConfigCustom.tagFrequent] ?? 0.0,
           ),
         ),
       ],
@@ -130,54 +130,54 @@ class _JackpotDisplayScreenState extends State<JackpotDisplayScreen> {
           top: settingsService.settings!.jpVegasScreen2DY,
           left: settingsService.settings!.getJpVegasScreen1DX,
           child: JackpotOdometer(
-            nameJP: "Vegas",
-            valueKey: 'Vegas',
-            hiveValue: hiveValues['Vegas'] ?? 0.0,
+            nameJP: ConfigCustom.tagVegas,
+            valueKey: ConfigCustom.tagVegas,
+            hiveValue: hiveValues[ConfigCustom.tagRlPpochi] ?? 0.0,
           ),
         ),
         Positioned(
           top: settingsService.settings!.jpMonthlyScreen2DY,
           right: settingsService.settings!.jpMonthlyScreen2DX,
           child: JackpotOdometer(
-            nameJP: "Monthly",
-            valueKey: 'Monthly',
-            hiveValue: hiveValues['Monthly'] ?? 0.0,
+            nameJP: ConfigCustom.tagMonthly,
+            valueKey: ConfigCustom.tagMonthly,
+            hiveValue: hiveValues[ConfigCustom.endpointWebSocket] ?? 0.0,
           ),
         ),
         Positioned(
           top: settingsService.settings!.jpWeeklyScreen2DY,
           left: settingsService.settings!.jpWeeklyScreen2DX,
           child: JackpotOdometer(
-            nameJP: "Weekly",
-            valueKey: 'Weekly',
-            hiveValue: hiveValues['Weekly'] ?? 0.0,
+            nameJP: ConfigCustom.tagWeekly,
+            valueKey: ConfigCustom.tagWeekly,
+            hiveValue: hiveValues[ConfigCustom.tagWeekly] ?? 0.0,
           ),
         ),
         Positioned(
           top: settingsService.settings!.jpTrippleScreen2DY,
           right: settingsService.settings!.jpTrippleScreen2DX,
           child: JackpotOdometer(
-            nameJP: "Triple",
-            valueKey: 'Triple',
-            hiveValue: hiveValues['Triple'] ?? 0.0,
+            nameJP: ConfigCustom.tagTriple,
+            valueKey: ConfigCustom.tagTriple,
+            hiveValue: hiveValues[ConfigCustom.tagTriple] ?? 0.0,
           ),
         ),
         Positioned(
           top: settingsService.settings!.jpDozenScreen2DY,
           left: settingsService.settings!.jpDozenScreen2DX,
           child: JackpotOdometer(
-            nameJP: "Dozen",
-            valueKey: 'Dozen',
-            hiveValue: hiveValues['Dozen'] ?? 0.0,
+            nameJP: ConfigCustom.tagDozen,
+            valueKey: ConfigCustom.tagDozen,
+            hiveValue: hiveValues[ConfigCustom.endpointWebSocket] ?? 0.0,
           ),
         ),
         Positioned(
           top: settingsService.settings!.jpHighlimitScreen2DY,
           right: settingsService.settings!.jpHighlimitScreen2DX,
           child: JackpotOdometer(
-            nameJP: "High Limit",
-            valueKey: 'HighLimit',
-            hiveValue: hiveValues['HighLimit'] ?? 0.0,
+            nameJP: ConfigCustom.tagHighLimit,
+            valueKey: ConfigCustom.tagHighLimit,
+            hiveValue: hiveValues[ConfigCustom.tagHighLimit] ?? 0.0,
           ),
         ),
       ],

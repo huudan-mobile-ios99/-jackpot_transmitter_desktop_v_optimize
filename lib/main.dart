@@ -16,7 +16,7 @@ import 'package:playtech_transmitter_app/screen/setting/bloc/setting_bloc.dart';
 import 'package:playtech_transmitter_app/screen/setting/bloc/setting_event.dart';
 import 'package:playtech_transmitter_app/screen/setting/setting_service.dart';
 import 'package:playtech_transmitter_app/service/widget/circlar_progress.dart';
-import 'package:playtech_transmitter_app/screen/background_screen/bloc/video_bloc.dart';
+import 'package:playtech_transmitter_app/screen/background_screen/bloc/video_blocv1.dart';
 import 'package:playtech_transmitter_app/screen/background_screen/bloc_jp_price/jackpot_price_bloc.dart';
 import 'package:playtech_transmitter_app/screen/background_screen/jackpot_hit_page.dart';
 import 'package:playtech_transmitter_app/screen/background_screen/bloc_socket_time/jackpot_bloc2.dart';
@@ -27,6 +27,8 @@ Future<void> main() async {
   debugProfilePaintsEnabled = true; // Highlights repainted areas
   WidgetsFlutterBinding.ensureInitialized();
   final hiveService = JackpotHiveService();
+  // await hiveService.clearHive();
+
   MediaKit.ensureInitialized();
   await Hive.initFlutter();
   await JackpotHiveService().initHive();
@@ -154,11 +156,11 @@ class MyAppBodyState extends State<MyAppBody> with WindowListener{
           );
         }
         return
-        const Scaffold(
+         Scaffold(
           body:
             Stack(
             children: [
-              RepaintBoundary(child: JackpotBackgroundShowWindowFadeAnimateV2()), //show first (contain background and number jp prices)
+              const RepaintBoundary(child: JackpotBackgroundShowWindowFadeAnimateV2()), //show first (contain background and number jp prices)
               RepaintBoundary(child: JackpotHitShowScreen()), //show second (contain video background of types of jp prices based on its id)
             ],
           )
