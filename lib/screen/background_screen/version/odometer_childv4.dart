@@ -14,13 +14,13 @@ class GameOdometerChildStyleOptimizedV4 extends StatefulWidget {
   final double hiveValue;
 
   const GameOdometerChildStyleOptimizedV4({
-    Key? key,
+    super.key,
     required this.startValue,
     required this.hiveValue,
     required this.endValue,
     this.totalDuration = 30,
     required this.nameJP,
-  }) : super(key: key);
+  });
 
   @override
   _GameOdometerChildStyleOptimizedV4State createState() => _GameOdometerChildStyleOptimizedV4State();

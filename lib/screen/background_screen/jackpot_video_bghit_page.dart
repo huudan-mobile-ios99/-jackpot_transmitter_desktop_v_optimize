@@ -6,12 +6,12 @@ import 'package:playtech_transmitter_app/service/config_custom.dart';
 import 'package:playtech_transmitter_app/screen/setting/setting_service.dart';
 import 'package:playtech_transmitter_app/service/widget/text_style.dart';
 
-class JackpotBackgroundVideoHitWindowFadeAnimationV2 extends StatefulWidget {
+class JackpotBackgroundVideoHitWindowFadeAnimationP extends StatefulWidget {
   final String number;
   final String value;
   final String id;
 
-  const JackpotBackgroundVideoHitWindowFadeAnimationV2({
+  const JackpotBackgroundVideoHitWindowFadeAnimationP({
     super.key,
     required this.number,
     required this.value,
@@ -19,10 +19,10 @@ class JackpotBackgroundVideoHitWindowFadeAnimationV2 extends StatefulWidget {
   });
 
   @override
-  _JackpotBackgroundVideoHitWindowFadeAnimationV2State createState() => _JackpotBackgroundVideoHitWindowFadeAnimationV2State();
+  _JackpotBackgroundVideoHitWindowFadeAnimationPState createState() => _JackpotBackgroundVideoHitWindowFadeAnimationPState();
 }
 
-class _JackpotBackgroundVideoHitWindowFadeAnimationV2State extends State<JackpotBackgroundVideoHitWindowFadeAnimationV2>
+class _JackpotBackgroundVideoHitWindowFadeAnimationPState extends State<JackpotBackgroundVideoHitWindowFadeAnimationP>
     with SingleTickerProviderStateMixin {
   late final Player _player;
   late final VideoController _controller;
@@ -33,53 +33,53 @@ class _JackpotBackgroundVideoHitWindowFadeAnimationV2State extends State<Jackpot
   late Animation<double> _fadeAnimation;
   final SettingsService settingsService = SettingsService();
   int _retryCount = 0;
-  static const int _maxRetries = 5;
+  static const int _maxRetries = 10;
   final Map<String, Media> _mediaCache = {};
 
   String getVideoAssetPath(String id) {
     switch (id) {
       case '0':
-        return settingsService.settings!.jpIdFrequentVideoPath;
+        return ConfigCustom.jp_id_frequent_video_path;
       case '1':
-        return settingsService.settings!.jpIdDailyVideoPath;
+        return ConfigCustom.jp_id_daily_video_path;
       case '2':
-        return settingsService.settings!.jpIdDozenVideoPath;
+        return ConfigCustom.jp_id_dozen_video_path;
       case '3':
-        return settingsService.settings!.jpIdWeeklyVideoPath;
+        return ConfigCustom.jp_id_weekly_video_path;
       case '4':
-       return settingsService.settings!.jpIdVegasVideoPath;
+       return ConfigCustom.jp_id_vegas_video_path;
       case '44':
-       return settingsService.settings!.jpIdMonthlyVideoPath;
+       return ConfigCustom.jp_id_monthly_video_path;
       case '46':
-        return settingsService.settings!.jpIdMonthlyVideoPath;
+        return ConfigCustom.jp_id_monthly_video_path;
       case '34':
-        return settingsService.settings!.jpIdDailygoldenVideoPath;
+        return ConfigCustom.jp_id_dailygolden_video_path;
       case '35':
-        return settingsService.settings!.jpIdTrippleVideoPath;
+        return ConfigCustom.jp_id_tripple_video_path;
 
       case '45':
-        return settingsService.settings!.jpIdHighlimitVideoPath;
+        return ConfigCustom.jp_id_highlimit_video_path;
       case '18':
-        return settingsService.settings!.jpIdHighlimitVideoPath;
+        return ConfigCustom.jp_id_highlimit_video_path;
 
       case '80': //tripple 777 price
-        return settingsService.settings!.jpId7771stVideoPath;
+        return ConfigCustom.jp_id_777_1st_video_path;
       case '81':
-        return settingsService.settings!.jpId7771stVideoPath;
+        return ConfigCustom.jp_id_777_1st_video_path;
       case '88': //1000 price jackpot town
-        return settingsService.settings!.jpId10001stVideoPath;
+        return ConfigCustom.jp_id_1000_1st_video_path;
       case '89':
-        return settingsService.settings!.jpId10001stVideoPath;
+        return ConfigCustom.jp_id_1000_1st_video_path;
       case '97': //ppochi video
-        return settingsService.settings!.jpIdPpochiMonFriVideoPath;
+        return ConfigCustom.jp_id_ppochi_Mon_Fri_video_path;
       case '98':
-        return settingsService.settings!.jpIdPpochiMonFriVideoPath;
+        return ConfigCustom.jp_id_ppochi_Mon_Fri_video_path;
       case '109':
-        return settingsService.settings!.jpIdRlPpochiVideoPath;
+        return ConfigCustom.jp_id_RL_ppochi_video_path;
       case '119':
-        return settingsService.settings!.jpIdNew20PpochiVideoPath;
+        return ConfigCustom.jp_id_New_20_ppochi_video_path;
       default:
-        return settingsService.settings!.jpIdFrequentVideoPath;
+        return '';
     }
   }
 
@@ -90,7 +90,7 @@ class _JackpotBackgroundVideoHitWindowFadeAnimationV2State extends State<Jackpot
 
     // Initialize fade animation
     _fadeController = AnimationController(
-      duration: Duration(milliseconds: ConfigCustom.switchBetweeScreenDurationForHitScreen.clamp(500, 1000)),
+      duration: Duration(milliseconds: ConfigCustom.switchBetweeScreenDurationForHitScreen),
       vsync: this,
     );
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -125,7 +125,7 @@ class _JackpotBackgroundVideoHitWindowFadeAnimationV2State extends State<Jackpot
   }
 
   @override
-  void didUpdateWidget(JackpotBackgroundVideoHitWindowFadeAnimationV2 oldWidget) {
+  void didUpdateWidget(JackpotBackgroundVideoHitWindowFadeAnimationP oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.id != oldWidget.id) {
       _loadVideo(getVideoAssetPath(widget.id));
@@ -178,51 +178,56 @@ class _JackpotBackgroundVideoHitWindowFadeAnimationV2State extends State<Jackpot
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        FadeTransition(
-          opacity: _fadeAnimation,
-          child: Video(
-            fill: Colors.transparent,
-            controls: (state) => Container(),
-            controller: _controller,
-            filterQuality: FilterQuality.none,
-            fit: BoxFit.contain,
-            width: screenSize.width,
-            height: screenSize.height,
-          ),
-        ),
-        Positioned(
-          left: 0,
-          right: 0,
-          top: screenSize.height / 2 - settingsService.settings!.textHitPriceSize * 0.935,
-          child: FadeTransition(
+    return
+    Container(
+      width: ConfigCustom.fixWidth/4,
+      height: ConfigCustom.fixHeight/4,
+      child: Stack(
+        // fit: StackFit.expand,
+        children: [
+          FadeTransition(
             opacity: _fadeAnimation,
-            child: Container(
-              alignment: Alignment.center,
-              child: Text(
-                (widget.value == '0.00' || widget.value == '0' || widget.value == '0.0')
-                    ? ""
-                    : '\$${_numberFormat.format(num.parse(widget.value))}',
-                style: textStyleJPHit,
-                textAlign: TextAlign.center,
+            child: Video(
+              fill: Colors.transparent,
+              controls: (state) => Container(),
+              controller: _controller,
+              filterQuality: FilterQuality.none,
+              fit: BoxFit.contain,
+              width: screenSize.width,
+              height: screenSize.height,
+            ),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            top: screenSize.height / 2 - ConfigCustom.text_hit_price_size * 0.935,
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: Container(
+                alignment: Alignment.center,
+                child: Text(
+                  (widget.value == '0.00' || widget.value == '0' || widget.value == '0.0')
+                      ? ""
+                      : '\$${_numberFormat.format(num.parse(widget.value))}',
+                  style: textStyleJPHit,
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
           ),
-        ),
-        Positioned(
-          bottom: settingsService.settings!.textHitNumberDY,
-          right: settingsService.settings!.textHitNumberDX,
-          child: FadeTransition(
-            opacity: _fadeAnimation,
-            child: Text(
-              '#${widget.number}',
-              style: textStyleSmall,
+          Positioned(
+            bottom: ConfigCustom.text_hit_number_dY,
+            right: ConfigCustom.text_hit_number_dX,
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: Text(
+                '#${widget.number}',
+                style: textStyleSmall,
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

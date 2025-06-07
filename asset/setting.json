@@ -67,11 +67,7 @@
   "jp_monthly_screen2_dY":193.5,
   "jp_vegas_screen1_dX":-8,
   "jp_vegas_screen2_dY":193.5,
-
-
   "jp_screen_comment":"jp_screen1 for layout 1 content 5 prices jackpot, jp_screen2 for layout 2 content 6 price jackpot",
-
-
   "jp_id_frequent":0,
   "jp_id_frequent_video_path":"asset/video/frequent.mpg",
   "jp_id_daily":1,

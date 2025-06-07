@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 // Settings class (unchanged from previous solution)
 class Settings {
@@ -192,6 +193,12 @@ class Settings {
     required this.hotseatIdNew20Ppochi,
     required this.jpIdNew20PpochiVideoPath,
   });
+  // settings_data.dart
+  Map<String, dynamic> settingsJson = {
+    'endpoint_web_socket': 'ws://example.com',
+    'endpoint_jp_hit': 'http://example.com',
+    // ... other fields
+  };
 
   factory Settings.fromJson(Map<String, dynamic> json) {
     return Settings(
@@ -391,31 +398,61 @@ class Settings {
 
 
 
-// Singleton SettingsService
+// // Singleton SettingsService
+// class SettingsService {
+//   static final SettingsService _instance = SettingsService._internal();
+//   factory SettingsService() => _instance;
+//   SettingsService._internal();
+
+//   Settings? _settings;
+//   String? _formattedJson;
+//   String? _error;
+
+//   Future<void> init(BuildContext context) async {
+//     try {
+//       final jsonString = await DefaultAssetBundle.of(context).loadString('asset/setting.json');
+//       final jsonData = json.decode(jsonString);
+//       _settings = Settings.fromJson(jsonData);
+//       _formattedJson = const JsonEncoder.withIndent('  ').convert(jsonData);
+//       _error = null;
+//     } catch (e) {
+//       _error = 'Error loading JSON: $e';
+//       _settings = null;
+//       _formattedJson = null;
+//     }
+//   }
+
+//   Settings? get settings => _settings;
+//   String? get formattedJson => _formattedJson;
+//   String? get error => _error;
+// }
+
+// import 'dart:convert';
+// import 'package:flutter/services.dart' show rootBundle;
+
 class SettingsService {
-  static final SettingsService _instance = SettingsService._internal();
-  factory SettingsService() => _instance;
-  SettingsService._internal();
-
-  Settings? _settings;
-  String? _formattedJson;
+  static SettingsService? _instance;
+  Map<String, dynamic>? _settings;
   String? _error;
+  bool _isInitialized = false;
 
-  Future<void> init(BuildContext context) async {
-    try {
-      final jsonString = await DefaultAssetBundle.of(context).loadString('asset/setting.json');
-      final jsonData = json.decode(jsonString);
-      _settings = Settings.fromJson(jsonData);
-      _formattedJson = const JsonEncoder.withIndent('  ').convert(jsonData);
-      _error = null;
-    } catch (e) {
-      _error = 'Error loading JSON: $e';
-      _settings = null;
-      _formattedJson = null;
-    }
+  static SettingsService get instance {
+    _instance ??= SettingsService();
+    return _instance!;
   }
 
-  Settings? get settings => _settings;
-  String? get formattedJson => _formattedJson;
+  Map<String, dynamic>? get settings => _settings;
   String? get error => _error;
+
+  Future<void> init(BuildContext? context) async {
+    if (_isInitialized) return;
+    try {
+      final jsonString = await rootBundle.loadString('assets/setting.json');
+      _settings = jsonDecode(jsonString) as Map<String, dynamic>;
+      _isInitialized = true;
+    } catch (e) {
+      _error = 'Failed to load settings: $e';
+      _isInitialized = true; // Mark as initialized to avoid retrying
+    }
+  }
 }

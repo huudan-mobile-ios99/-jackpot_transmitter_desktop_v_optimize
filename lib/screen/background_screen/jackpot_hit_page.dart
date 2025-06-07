@@ -10,12 +10,12 @@ import 'bloc_jp_price/jackpot_price_bloc.dart';
 import 'bloc_jp_price/jackpot_price_event.dart';
 
 class JackpotHitShowScreen extends StatelessWidget {
-  JackpotHitShowScreen({super.key});
+  const JackpotHitShowScreen({super.key});
 
 
   @override
   Widget build(BuildContext context) {
-    Logger _logger = Logger(); //loggger for ligh weight log
+    Logger logger = Logger(); //loggger for ligh weight log
     return
     // JackpotBackgroundVideoHitWindowFadeAnimation(number: '1111', value: '33333', id: '2');
 
@@ -25,14 +25,14 @@ class JackpotHitShowScreen extends StatelessWidget {
         if (state.showImagePage && state.latestHit != null) {
           final level = state.latestHit!['id'].toString();
           context.read<JackpotPriceBloc>().add(JackpotPriceResetEvent(level));
-          _logger.d('Dispatched JackpotPriceResetEvent for level: $level');
+          logger.d('Dispatched JackpotPriceResetEvent for level: $level');
         }
       },
      child: BlocSelector<JackpotBloc2, JackpotState2, Map<String, dynamic>?>(
         selector: (state) {
           // Select hit data only when showImagePage is true and latestHit exists
           if (state.showImagePage && state.latestHit != null) {
-            _logger.d('JackpotHitShowScreen: ${state.latestHit}');
+            logger.d('JackpotHitShowScreen: ${state.latestHit}');
             return state.latestHit;
           }
           // Return null for loading, error, or empty states
@@ -55,7 +55,7 @@ class JackpotHitShowScreen extends StatelessWidget {
             return const Center(child: Text('', style: TextStyle(color: Colors.white)));
           }
           // Hit state
-          return JackpotBackgroundVideoHitWindowFadeAnimationV2(
+          return JackpotBackgroundVideoHitWindowFadeAnimationP(
             id: hitData['id'].toString(),
             number: hitData['machineNumber'].toString(),
             value: hitData['amount'] == [] ? "0" : hitData['amount'].toString(),

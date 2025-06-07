@@ -162,19 +162,19 @@ class _GameOdometerChildStyleOptimizedV3State extends State<GameOdometerChildSty
 
   @override
   Widget build(BuildContext context) {
-    final double letterWidth = settingsService.settings!.textOdoLetterWidth;
-    final double verticalOffset = settingsService.settings!.textOdoLetterVerticalOffset;
+    final double letterWidth = ConfigCustom.text_odo_letter_width;
+    final double verticalOffset = ConfigCustom.text_odo_letter_vertical_offset;
 
     return ClipRect(
       child: RepaintBoundary(
         child: Container(
           alignment: Alignment.center,
           width: ConfigCustom.fixWidth / 2,
-          height: settingsService.settings!.odoHeight,
+          height: ConfigCustom.odo_height,
           child: Stack(
             children: [
               Positioned(
-                top: -settingsService.settings!.odoPositionTop,
+                top: -ConfigCustom.odo_position_top,
                 left: 0,
                 right: 0,
                 child: ValueListenableBuilder<double>(

@@ -1,4 +1,4 @@
-part of 'video_blocv1.dart';
+part of 'video_bloc.dart';
 
 class ViddeoState extends Equatable {
   final String currentVideo;

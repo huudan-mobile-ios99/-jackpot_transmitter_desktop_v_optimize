@@ -1,20 +1,39 @@
 import 'package:equatable/equatable.dart';
-abstract class JackpotPriceEvent {}
+
+abstract class JackpotPriceEvent extends Equatable {
+  const JackpotPriceEvent();
+
+  @override
+  List<Object?> get props => [];
+}
 
 class JackpotPriceUpdateEvent extends JackpotPriceEvent {
   final String level;
   final double value;
-  JackpotPriceUpdateEvent(this.level, this.value);
+
+  const JackpotPriceUpdateEvent(this.level, this.value);
+
+  @override
+  List<Object?> get props => [level, value];
+}
+
+class JackpotPriceResetEvent extends JackpotPriceEvent {
+  final String level;
+
+  const JackpotPriceResetEvent(this.level);
+
+  @override
+  List<Object?> get props => [level];
 }
 
 class JackpotPriceConnectionEvent extends JackpotPriceEvent {
   final bool isConnected;
   final String? error;
-  JackpotPriceConnectionEvent(this.isConnected, {this.error});
+
+  const JackpotPriceConnectionEvent(this.isConnected, {this.error});
+
+  @override
+  List<Object?> get props => [isConnected, error];
 }
 
-
-class JackpotPriceResetEvent extends JackpotPriceEvent {
-  final String level;
-  JackpotPriceResetEvent(this.level);
-}
+class JackpotPriceTimerTickEvent extends JackpotPriceEvent {}

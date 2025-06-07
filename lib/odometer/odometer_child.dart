@@ -39,12 +39,14 @@ class _GameOdometerChildStyleOptimizedState extends State<GameOdometerChildStyle
   Timer? _animationTimer;
   final String fontFamily = 'sf-pro-display';
   bool _isFirstRun = true; // Flag to use hiveValue on first run
-  Logger _logger = Logger();
+  final Logger _logger = Logger();
+  static const Duration _debounceDuration = Duration(seconds: 0);
+  DateTime? _lastUpdateTime;
+  bool _isDisposing = false;
 
   @override
   void initState() {
     super.initState();
-    // Use hiveValue for initial startValue if non-zero, else fall back to startValue
     final initialValue = widget.startValue == 0.0 ? widget.hiveValue : widget.startValue;
     currentValueNotifier = ValueNotifier<double>(initialValue);
     durationPerStep = calculationDurationPerStep(
@@ -57,30 +59,12 @@ class _GameOdometerChildStyleOptimizedState extends State<GameOdometerChildStyle
       startValue: widget.hiveValue,
       endValue: widget.endValue,
     );
-
     _initializeAnimationController();
     _updateAnimation(currentValueNotifier.value, currentValueNotifier.value);
     // _isFirstRun? debugPrint('#FirstRun') : debugPrint('#NextRun');
   }
 
-  void _initializeAnimationController() {
-    animationController = AnimationController(
-      duration: Duration(milliseconds: durationPerStep),
-      vsync: this,
-    );
-  }
 
-  void _updateAnimation(double start, double end) {
-    odometerAnimation = OdometerTween(
-      begin: OdometerNumber((start * 100).round()),
-      end: OdometerNumber((end * 100).round()),
-    ).animate(
-      CurvedAnimation(
-        parent: animationController,
-        curve: Curves.linear,
-      ),
-    );
-  }
 
 
 
@@ -89,6 +73,11 @@ class _GameOdometerChildStyleOptimizedState extends State<GameOdometerChildStyle
   @override
   void didUpdateWidget(covariant GameOdometerChildStyleOptimized oldWidget) {
     super.didUpdateWidget(oldWidget);
+    final now = DateTime.now();
+    if (_lastUpdateTime != null && now.difference(_lastUpdateTime!) < _debounceDuration) {
+      // _logger.d('Odometer: ${widget.nameJP}, Skipping update due to debounce, lastUpdate: $_lastUpdateTime');
+      return;
+    }
     if (widget.startValue != oldWidget.startValue || widget.endValue != oldWidget.endValue || widget.totalDuration != oldWidget.totalDuration) {
       _animationTimer?.cancel();
       currentValueNotifier.value = widget.startValue == 0.0 ? widget.endValue : widget.startValue;
@@ -103,14 +92,16 @@ class _GameOdometerChildStyleOptimizedState extends State<GameOdometerChildStyle
         ..duration = Duration(milliseconds: durationPerStep);
        _updateAnimation(currentValueNotifier.value, currentValueNotifier.value);
 
-
       if (_isFirstRun == true && widget.hiveValue > 0 && widget.hiveValue < widget.endValue) {
         _startAutoAnimation(widget.hiveValue);
       }
-      if (widget.startValue != 0.0  || widget.startValue !=0) {
+      if (widget.startValue != 0.0  || widget.startValue !=0 && !_isDisposing) {
         _startAutoAnimation(widget.startValue);
       }
+
+
       _isFirstRun = false; // Disable hiveValue after first run
+      _lastUpdateTime = now;
     }
   }
 
@@ -119,11 +110,16 @@ class _GameOdometerChildStyleOptimizedState extends State<GameOdometerChildStyle
 
   void _startAutoAnimation(double startValue) {
     const increment = 0.01;
-    final interval = Duration(milliseconds:  durationPerStep.clamp(15, 75000));
+    final interval = Duration(milliseconds:  durationPerStep.clamp(20, 5000));
     _animationTimer?.cancel();
     currentValueNotifier.value = startValue;
     _updateAnimation(startValue, startValue);
     _animationTimer = Timer.periodic(interval, (timer) {
+      if (!mounted || _isDisposing || currentValueNotifier.value >= widget.endValue) {
+        timer.cancel();
+        // _logger.d('Odometer: ${widget.nameJP}, Animation completed or unmounted, currentValue: ${currentValueNotifier.value}');
+        return;
+      }
       if (currentValueNotifier.value >= widget.endValue || !mounted) {
         timer.cancel();
         return;
@@ -132,6 +128,7 @@ class _GameOdometerChildStyleOptimizedState extends State<GameOdometerChildStyle
       _updateAnimation(currentValueNotifier.value, nextValue);
       currentValueNotifier.value = nextValue;
       animationController.forward(from: 0.0);
+
     });
   }
 
@@ -145,19 +142,19 @@ class _GameOdometerChildStyleOptimizedState extends State<GameOdometerChildStyle
 
   @override
   Widget build(BuildContext context) {
-    final double letterWidth = settingsService.settings!.textOdoLetterWidth;
-    final double verticalOffset = settingsService.settings!.textOdoLetterVerticalOffset;
+    final double letterWidth = ConfigCustom.text_odo_letter_width;
+    final double verticalOffset = ConfigCustom.text_odo_letter_vertical_offset;
 
     return ClipRect(
       child: RepaintBoundary(
         child: Container(
           alignment: Alignment.center,
           width: ConfigCustom.fixWidth / 2,
-          height: settingsService.settings!.odoHeight,
+          height: ConfigCustom.odo_height,
           child: Stack(
             children: [
               Positioned(
-                top: -settingsService.settings!.odoPositionTop,
+                top: -ConfigCustom.odo_position_top,
                 left: 0,
                 right: 0,
                 child: ValueListenableBuilder<double>(
@@ -184,6 +181,24 @@ class _GameOdometerChildStyleOptimizedState extends State<GameOdometerChildStyle
       ),
     );
   }
+  void _initializeAnimationController() {
+    animationController = AnimationController(
+      duration: Duration(milliseconds: durationPerStep),
+      vsync: this,
+    );
+  }
+
+  void _updateAnimation(double start, double end) {
+    odometerAnimation = OdometerTween(
+      begin: OdometerNumber((start * 100).round()),
+      end: OdometerNumber((end * 100).round()),
+    ).animate(
+      CurvedAnimation(
+        parent: animationController,
+        curve: Curves.linear,
+      ),
+    );
+  }
 }
 
 int calculationDurationPerStep({
@@ -196,5 +211,5 @@ int calculationDurationPerStep({
   }
   final totalSteps = ((endValue - startValue) / 0.01).ceil();
   final durationMs = (totalDuration * 1000) / totalSteps;
-  return durationMs.round().clamp(15, 75000);
+  return durationMs.round().clamp(20, 5000);
 }

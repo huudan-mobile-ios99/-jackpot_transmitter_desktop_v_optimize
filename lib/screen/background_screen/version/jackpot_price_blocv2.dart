@@ -6,7 +6,7 @@ import 'package:playtech_transmitter_app/screen/background_screen/bloc_jp_price/
 import 'package:playtech_transmitter_app/screen/background_screen/bloc_jp_price/jackpot_state_state.dart';
 import 'package:playtech_transmitter_app/service/config_custom.dart';
 import 'package:web_socket_channel/io.dart';
-import 'jackpot_price_event.dart';
+import '../bloc_jp_price/jackpot_price_event.dart';
 
 class JackpotPriceBlocV2 extends Bloc<JackpotPriceEvent, JackpotPriceState> {
   late IOWebSocketChannel channel;
@@ -35,14 +35,14 @@ class JackpotPriceBlocV2 extends Bloc<JackpotPriceEvent, JackpotPriceState> {
   JackpotPriceBlocV2() : super(JackpotPriceState.initial()) {
     on<JackpotPriceUpdateEvent>(_onUpdate);
     on<JackpotPriceConnectionEvent>(_onConnection);
-    debugPrint('JackpotPriceBlocV2: Initializing WebSocket connection to ${ConfigCustom.endpointWebSocket}');
+    debugPrint('JackpotPriceBlocV2: Initializing WebSocket connection to ${ConfigCustom.endpoint_web_socket}');
     _connectToWebSocket();
   }
 
   void _connectToWebSocket() {
     try {
       debugPrint('JackpotPriceBlocV2: Connecting to WebSocket');
-      channel = IOWebSocketChannel.connect(ConfigCustom.endpointWebSocket);
+      channel = IOWebSocketChannel.connect(ConfigCustom.endpoint_web_socket);
       add(JackpotPriceConnectionEvent(true));
       channel.stream.listen(
         (message) async {
